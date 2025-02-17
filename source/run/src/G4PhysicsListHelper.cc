@@ -255,8 +255,6 @@ void G4PhysicsListHelper::AddTransportation()
 // --------------------------------------------------------------------
 void G4PhysicsListHelper::ReadOrdingParameterTable()
 {
-  std::ifstream fIn;
-
   // create OrdParamTable
   if (theTable != nullptr) {
     theTable->clear();
@@ -267,7 +265,11 @@ void G4PhysicsListHelper::ReadOrdingParameterTable()
   theTable = new G4OrdParamTable();
   sizeOfTable = 0;
 
-  ReadInDefaultOrderingParameter();
+  if(const char *G4ORDPARAMTABLE = getenv("G4ORDPARAMTABLE")) {
+    ReadInUserOrderingParameter(G4ORDPARAMTABLE);
+  } else {
+    ReadInDefaultOrderingParameter();
+  }
 
   if (sizeOfTable == 0) {
 #ifdef G4VERBOSE
@@ -1164,4 +1166,18 @@ void G4PhysicsListHelper::ReadInDefaultOrderingParameter()
   tmp.isDuplicable = true;
   theTable->push_back(tmp);
   sizeOfTable += 1;
+}
+
+// --------------------------------------------------------------------
+void G4PhysicsListHelper::ReadInUserOrderingParameter(const G4String &path)
+{
+  std::ifstream fin(path);
+  if(!fin) return;
+
+  G4PhysicsListOrderingParameter tmp;
+  while (fin >> tmp.processTypeName >> tmp.processType >> tmp.processSubType >> tmp.ordering[0]
+         >> tmp.ordering[1] >> tmp.ordering[2] >> tmp.isDuplicable) {
+    theTable->push_back(tmp);
+    sizeOfTable += 1;
+  }
 }

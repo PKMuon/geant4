@@ -91,6 +91,7 @@ class G4PhysicsListHelper
 
     void ReadOrdingParameterTable();
     void ReadInDefaultOrderingParameter();
+    void ReadInUserOrderingParameter(const G4String &path);
 
   private:
     using G4OrdParamTable = std::vector<G4PhysicsListOrderingParameter>;
